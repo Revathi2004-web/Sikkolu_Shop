@@ -51,7 +51,7 @@ const AdminLogin = () => {
             Login
           </Button>
         </form>
-        <p className="text-xs text-muted-foreground mt-6">Default: admin / admin123</p>
+        <p className="text-xs text-muted-foreground mt-6">Enter your admin credentials</p>
       </div>
     </div>
   );
