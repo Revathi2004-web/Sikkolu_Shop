@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { LogOut, Plus, Package, CreditCard, Phone, Users } from 'lucide-react';
+import { LogOut, Plus, Package, CreditCard, Phone, Users, ClipboardList } from 'lucide-react';
 import ProductManager from '@/components/admin/ProductManager';
 import CategoryManager from '@/components/admin/CategoryManager';
 import PaymentManager from '@/components/admin/PaymentManager';
 import ContactManager from '@/components/admin/ContactManager';
 import AdminManager from '@/components/admin/AdminManager';
+import OrderManager from '@/components/admin/OrderManager';
 import {
   Dialog,
   DialogContent,
@@ -18,16 +20,19 @@ import {
 
 const AdminDashboard = () => {
   const { isAdmin, adminLogout } = useStore();
+  const { isAdmin: isDbAdmin } = useAuth();
   const navigate = useNavigate();
   const [fabOpen, setFabOpen] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
 
-  useEffect(() => {
-    if (!isAdmin) navigate('/admin/login');
-  }, [isAdmin, navigate]);
+  const hasAccess = isAdmin || isDbAdmin;
 
-  if (!isAdmin) return null;
+  useEffect(() => {
+    if (!hasAccess) navigate('/admin/login');
+  }, [hasAccess, navigate]);
+
+  if (!hasAccess) return null;
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -38,13 +43,18 @@ const AdminDashboard = () => {
         </Button>
       </header>
 
-      <Tabs defaultValue="inventory" className="px-4 pt-4">
-        <TabsList className="w-full grid grid-cols-4 h-12 rounded-xl">
+      <Tabs defaultValue="orders" className="px-4 pt-4">
+        <TabsList className="w-full grid grid-cols-5 h-12 rounded-xl">
+          <TabsTrigger value="orders" className="text-xs gap-1"><ClipboardList className="w-4 h-4" /> Orders</TabsTrigger>
           <TabsTrigger value="inventory" className="text-xs gap-1"><Package className="w-4 h-4" /> Items</TabsTrigger>
           <TabsTrigger value="payments" className="text-xs gap-1"><CreditCard className="w-4 h-4" /> Pay</TabsTrigger>
-          <TabsTrigger value="contacts" className="text-xs gap-1"><Phone className="w-4 h-4" /> Contacts</TabsTrigger>
-          <TabsTrigger value="admins" className="text-xs gap-1"><Users className="w-4 h-4" /> Admins</TabsTrigger>
+          <TabsTrigger value="contacts" className="text-xs gap-1"><Phone className="w-4 h-4" /> Contact</TabsTrigger>
+          <TabsTrigger value="admins" className="text-xs gap-1"><Users className="w-4 h-4" /> Admin</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="orders" className="mt-4">
+          <OrderManager />
+        </TabsContent>
 
         <TabsContent value="inventory" className="mt-4 space-y-6">
           <ProductManager showAdd={showAddProduct} setShowAdd={setShowAddProduct} />

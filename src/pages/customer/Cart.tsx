@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/context/StoreContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
-import { toast } from 'sonner';
+
 
 const Cart = () => {
   const { cart, updateCartQty, removeFromCart, clearCart, paymentMethods } = useStore();
@@ -12,9 +12,7 @@ const Cart = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    toast.success('SMS Sent: Your Sikkolu Specials order is confirmed! 🎉');
-    clearCart();
-    navigate('/store');
+    navigate('/checkout');
   };
 
   return (

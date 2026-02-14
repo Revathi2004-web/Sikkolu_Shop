@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Heart, ArrowLeft, Search, Phone } from 'lucide-react';
+import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const CustomerStore = () => {
   const { products, categories, addToCart, wishlist, toggleWishlist, cart, contacts } = useStore();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
@@ -22,6 +24,11 @@ const CustomerStore = () => {
 
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-background pb-8">
       <header className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-4 py-3">
@@ -30,7 +37,10 @@ const CustomerStore = () => {
             <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
           <h1 className="text-xl font-serif font-bold">Sikkolu <span className="text-primary">Specials</span></h1>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/orders')}>
+              <Package className="w-5 h-5" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => setShowContact(true)}>
               <Phone className="w-5 h-5" />
             </Button>
@@ -41,6 +51,9 @@ const CustomerStore = () => {
                   {cartCount}
                 </span>
               )}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>

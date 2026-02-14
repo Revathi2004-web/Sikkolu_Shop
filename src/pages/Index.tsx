@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Lock } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
@@ -15,13 +17,15 @@ const Landing = () => {
 
       <div className="w-full max-w-sm space-y-5">
         <button
-          onClick={() => navigate('/store')}
+          onClick={() => navigate(user ? '/store' : '/auth')}
           className="w-full bg-primary text-primary-foreground rounded-2xl p-8 flex flex-col items-center gap-4 shadow-lg hover:shadow-xl transition-all active:scale-[0.98] touch-manipulation"
         >
           <ShoppingBag className="w-12 h-12" />
           <div>
             <div className="text-2xl font-serif font-bold">🛍️ Customer Store</div>
-            <div className="text-primary-foreground/80 text-sm mt-1">Browse & shop our collection</div>
+            <div className="text-primary-foreground/80 text-sm mt-1">
+              {user ? 'Browse & shop our collection' : 'Login to start shopping'}
+            </div>
           </div>
         </button>
 

@@ -1,0 +1,92 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { toast } from 'sonner';
+
+const CustomerAuth = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (isLogin) {
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Welcome back! 🎉');
+        navigate('/store');
+      }
+    } else {
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Account created! Please check your email to verify, then login.');
+        setIsLogin(true);
+      }
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col px-6 py-8">
+      <button onClick={() => navigate('/')} className="flex items-center gap-2 text-muted-foreground mb-8 touch-manipulation">
+        <ArrowLeft className="w-5 h-5" /> Back
+      </button>
+
+      <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full">
+        <div className="bg-accent w-20 h-20 rounded-full flex items-center justify-center mb-6">
+          <ShoppingBag className="w-10 h-10 text-primary" />
+        </div>
+        <h1 className="text-3xl font-serif font-bold mb-2">
+          {isLogin ? 'Welcome Back' : 'Create Account'}
+        </h1>
+        <p className="text-muted-foreground mb-8">
+          {isLogin ? 'Login to continue shopping' : 'Register to start shopping'}
+        </p>
+
+        <form onSubmit={handleSubmit} className="w-full space-y-4">
+          <Input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="h-14 text-lg rounded-xl"
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="h-14 text-lg rounded-xl"
+            minLength={6}
+            required
+          />
+          <Button type="submit" className="w-full h-14 text-lg rounded-xl font-semibold" disabled={loading}>
+            {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
+          </Button>
+        </form>
+
+        <button
+          onClick={() => setIsLogin(!isLogin)}
+          className="mt-6 text-sm text-primary font-medium touch-manipulation"
+        >
+          {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default CustomerAuth;
