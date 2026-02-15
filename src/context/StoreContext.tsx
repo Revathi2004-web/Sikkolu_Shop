@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Product, Category, PaymentMethod, ContactNumber, AdminUser, CartItem } from '@/types';
+import { Product, Category, PaymentMethod, ContactNumber, CartItem } from '@/types';
 import { toast } from 'sonner';
 
 interface StoreContextType {
@@ -15,12 +15,6 @@ interface StoreContextType {
   contacts: ContactNumber[];
   addContact: (c: Omit<ContactNumber, 'id'>) => void;
   deleteContact: (id: string) => void;
-  admins: AdminUser[];
-  addAdmin: (a: Omit<AdminUser, 'id'>) => void;
-  deleteAdmin: (id: string) => void;
-  isAdmin: boolean;
-  adminLogin: (username: string, password: string) => boolean;
-  adminLogout: () => void;
   cart: CartItem[];
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -48,10 +42,6 @@ const sampleProducts: Product[] = [
   { id: '6', name: 'Brass Diya Set', price: 799, image: '', category: 'Home Decor', stock: 25, description: 'Traditional brass diya set' },
 ];
 
-const sampleAdmins: AdminUser[] = [
-  { id: '1', username: 'admin', password: 'admin123' },
-];
-
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(sampleProducts);
   const [categories, setCategories] = useState<Category[]>(sampleCategories);
@@ -61,8 +51,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [contacts, setContacts] = useState<ContactNumber[]>([
     { id: '1', phone: '+91 98765 43210', label: 'Main Contact' },
   ]);
-  const [admins, setAdmins] = useState<AdminUser[]>(sampleAdmins);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
 
@@ -100,22 +88,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setContacts(prev => prev.filter(c => c.id !== id));
     toast.success('Contact deleted');
   };
-  const addAdmin = (a: Omit<AdminUser, 'id'>) => {
-    setAdmins(prev => [...prev, { ...a, id: genId() }]);
-    toast.success('Admin added!');
-  };
-  const deleteAdmin = (id: string) => {
-    if (admins.length <= 1) { toast.error('Cannot delete last admin'); return; }
-    setAdmins(prev => prev.filter(a => a.id !== id));
-    toast.success('Admin removed');
-  };
-  const adminLogin = (username: string, password: string) => {
-    const found = admins.find(a => a.username === username && a.password === password);
-    if (found) { setIsAdmin(true); toast.success('Welcome, Boss! 🔥'); return true; }
-    toast.error('Invalid credentials');
-    return false;
-  };
-  const adminLogout = () => { setIsAdmin(false); toast('Logged out'); };
   const addToCart = (product: Product) => {
     setCart(prev => {
       const existing = prev.find(c => c.product.id === product.id);
@@ -142,8 +114,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       categories, addCategory, deleteCategory,
       paymentMethods, addPaymentMethod, deletePaymentMethod,
       contacts, addContact, deleteContact,
-      admins, addAdmin, deleteAdmin,
-      isAdmin, adminLogin, adminLogout,
       cart, addToCart, removeFromCart, updateCartQty, clearCart,
       wishlist, toggleWishlist,
     }}>
