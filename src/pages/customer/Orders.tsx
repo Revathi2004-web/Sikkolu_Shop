@@ -87,8 +87,22 @@ const Orders = () => {
 
   const handleUploadScreenshot = async (orderId: string, file: File) => {
     if (!user) return;
+
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    if (file.size > maxSize) {
+      toast.error('File too large. Max 5MB allowed.');
+      return;
+    }
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only JPEG, PNG, GIF, and WebP images are allowed.');
+      return;
+    }
+
     setUploading(true);
-    const filePath = `${user.id}/${orderId}-${Date.now()}.${file.name.split('.').pop()}`;
+    const ext = file.type.split('/')[1];
+    const filePath = `${user.id}/${orderId}-${Date.now()}.${ext}`;
     const { error: uploadError } = await supabase.storage
       .from('payment-screenshots')
       .upload(filePath, file);
@@ -99,13 +113,10 @@ const Orders = () => {
       return;
     }
 
-    const { data: urlData } = supabase.storage
-      .from('payment-screenshots')
-      .getPublicUrl(filePath);
-
+    // Store only the file path, not a public URL
     await supabase
       .from('orders')
-      .update({ payment_screenshot_url: urlData.publicUrl, status: 'paid' as any })
+      .update({ payment_screenshot_url: filePath, status: 'paid' as any })
       .eq('id', orderId);
 
     toast.success('Payment screenshot uploaded! 🎉');
