@@ -4,9 +4,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Lock } from 'lucide-react';
+import { toast } from 'sonner';
+
+const ADMIN_USERNAME = 'Sikkoluadmin';
+const ADMIN_EMAIL = 'devisrichintala23@gmail.com';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -14,11 +18,17 @@ const AdminLogin = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (username !== ADMIN_USERNAME) {
+      toast.error('Invalid admin username');
+      return;
+    }
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(ADMIN_EMAIL, password);
     setLoading(false);
     if (!error) {
       navigate('/admin/dashboard');
+    } else {
+      toast.error(error.message || 'Login failed');
     }
   };
 
@@ -37,10 +47,10 @@ const AdminLogin = () => {
 
         <form onSubmit={handleLogin} className="w-full space-y-4">
           <Input
-            type="email"
-            placeholder="Admin Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
             className="h-14 text-lg rounded-xl"
             required
           />
@@ -56,7 +66,7 @@ const AdminLogin = () => {
             {loading ? 'Signing in...' : 'Login'}
           </Button>
         </form>
-        <p className="text-xs text-muted-foreground mt-6">Sign in with your admin account</p>
+        <p className="text-xs text-muted-foreground mt-6">Sign in with your admin credentials</p>
       </div>
     </div>
   );
