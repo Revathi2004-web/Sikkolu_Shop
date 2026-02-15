@@ -118,7 +118,13 @@ const OrderManager = () => {
                 size="sm"
                 variant="outline"
                 className="rounded-lg text-xs mb-2"
-                onClick={() => setScreenshotUrl(order.payment_screenshot_url)}
+                onClick={async () => {
+                  const { data } = await supabase.storage
+                    .from('payment-screenshots')
+                    .createSignedUrl(order.payment_screenshot_url, 3600);
+                  if (data?.signedUrl) setScreenshotUrl(data.signedUrl);
+                  else toast.error('Failed to load screenshot');
+                }}
               >
                 📸 View Payment Screenshot
               </Button>
