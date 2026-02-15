@@ -1,19 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStore } from '@/context/StoreContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Lock } from 'lucide-react';
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { adminLogin } = useStore();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminLogin(username, password)) {
+    setLoading(true);
+    const { error } = await signIn(email, password);
+    setLoading(false);
+    if (!error) {
       navigate('/admin/dashboard');
     }
   };
@@ -33,25 +37,26 @@ const AdminLogin = () => {
 
         <form onSubmit={handleLogin} className="w-full space-y-4">
           <Input
-            placeholder="Secret Username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            type="email"
+            placeholder="Admin Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             className="h-14 text-lg rounded-xl"
             required
           />
           <Input
             type="password"
-            placeholder="Secret Password"
+            placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             className="h-14 text-lg rounded-xl"
             required
           />
-          <Button type="submit" className="w-full h-14 text-lg rounded-xl font-semibold">
-            Login
+          <Button type="submit" className="w-full h-14 text-lg rounded-xl font-semibold" disabled={loading}>
+            {loading ? 'Signing in...' : 'Login'}
           </Button>
         </form>
-        <p className="text-xs text-muted-foreground mt-6">Enter your admin credentials</p>
+        <p className="text-xs text-muted-foreground mt-6">Sign in with your admin account</p>
       </div>
     </div>
   );

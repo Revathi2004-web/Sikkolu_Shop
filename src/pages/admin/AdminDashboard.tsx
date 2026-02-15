@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useStore } from '@/context/StoreContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { LogOut, Plus, Package, CreditCard, Phone, Users, ClipboardList } from 'lucide-react';
+import { LogOut, Plus, Package, CreditCard, Phone, ClipboardList } from 'lucide-react';
 import ProductManager from '@/components/admin/ProductManager';
 import CategoryManager from '@/components/admin/CategoryManager';
 import PaymentManager from '@/components/admin/PaymentManager';
 import ContactManager from '@/components/admin/ContactManager';
-import AdminManager from '@/components/admin/AdminManager';
 import OrderManager from '@/components/admin/OrderManager';
 import {
   Dialog,
@@ -19,37 +17,33 @@ import {
 } from '@/components/ui/dialog';
 
 const AdminDashboard = () => {
-  const { isAdmin, adminLogout } = useStore();
-  const { isAdmin: isDbAdmin } = useAuth();
+  const { isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [fabOpen, setFabOpen] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
 
-  const hasAccess = isAdmin || isDbAdmin;
-
   useEffect(() => {
-    if (!hasAccess) navigate('/admin/login');
-  }, [hasAccess, navigate]);
+    if (!isAdmin) navigate('/admin/login');
+  }, [isAdmin, navigate]);
 
-  if (!hasAccess) return null;
+  if (!isAdmin) return null;
 
   return (
     <div className="min-h-screen bg-background pb-24">
       <header className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
         <h1 className="text-xl font-serif font-bold">Boss Mode 🔥</h1>
-        <Button variant="ghost" size="icon" onClick={() => { adminLogout(); navigate('/'); }}>
+        <Button variant="ghost" size="icon" onClick={() => { signOut(); navigate('/'); }}>
           <LogOut className="w-5 h-5" />
         </Button>
       </header>
 
       <Tabs defaultValue="orders" className="px-4 pt-4">
-        <TabsList className="w-full grid grid-cols-5 h-12 rounded-xl">
+        <TabsList className="w-full grid grid-cols-4 h-12 rounded-xl">
           <TabsTrigger value="orders" className="text-xs gap-1"><ClipboardList className="w-4 h-4" /> Orders</TabsTrigger>
           <TabsTrigger value="inventory" className="text-xs gap-1"><Package className="w-4 h-4" /> Items</TabsTrigger>
           <TabsTrigger value="payments" className="text-xs gap-1"><CreditCard className="w-4 h-4" /> Pay</TabsTrigger>
           <TabsTrigger value="contacts" className="text-xs gap-1"><Phone className="w-4 h-4" /> Contact</TabsTrigger>
-          <TabsTrigger value="admins" className="text-xs gap-1"><Users className="w-4 h-4" /> Admin</TabsTrigger>
         </TabsList>
 
         <TabsContent value="orders" className="mt-4">
@@ -67,10 +61,6 @@ const AdminDashboard = () => {
 
         <TabsContent value="contacts" className="mt-4">
           <ContactManager />
-        </TabsContent>
-
-        <TabsContent value="admins" className="mt-4">
-          <AdminManager />
         </TabsContent>
       </Tabs>
 

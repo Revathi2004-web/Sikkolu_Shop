@@ -27,12 +27,6 @@ export interface ContactNumber {
   label: string;
 }
 
-export interface AdminUser {
-  id: string;
-  username: string;
-  password: string;
-}
-
 export interface CartItem {
   product: Product;
   quantity: number;
