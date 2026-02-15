@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect, createContext, useContext, ReactNode, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 
@@ -14,11 +14,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const MAX_ATTEMPTS = 5;
+const BLOCK_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const failedAttempts = useRef(0);
+  const blockedUntil = useRef<number | null>(null);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -53,17 +58,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(!!data);
   };
 
+  const checkRateLimit = useCallback((): { blocked: boolean; error?: any } => {
+    if (blockedUntil.current && Date.now() < blockedUntil.current) {
+      const waitSec = Math.ceil((blockedUntil.current - Date.now()) / 1000);
+      return { blocked: true, error: { message: `Too many attempts. Please wait ${waitSec} seconds.` } };
+    }
+    if (blockedUntil.current && Date.now() >= blockedUntil.current) {
+      blockedUntil.current = null;
+      failedAttempts.current = 0;
+    }
+    return { blocked: false };
+  }, []);
+
+  const recordFailure = useCallback(() => {
+    failedAttempts.current += 1;
+    if (failedAttempts.current >= MAX_ATTEMPTS) {
+      blockedUntil.current = Date.now() + BLOCK_DURATION_MS;
+      failedAttempts.current = 0;
+    }
+  }, []);
+
   const signUp = async (email: string, password: string) => {
+    const rl = checkRateLimit();
+    if (rl.blocked) return { error: rl.error };
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin },
     });
+    if (error) recordFailure();
+    else failedAttempts.current = 0;
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
+    const rl = checkRateLimit();
+    if (rl.blocked) return { error: rl.error };
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) recordFailure();
+    else failedAttempts.current = 0;
     return { error };
   };
 

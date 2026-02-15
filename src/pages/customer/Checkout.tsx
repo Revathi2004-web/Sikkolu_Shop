@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { orderSchema } from '@/lib/validation';
 
 const Checkout = () => {
   const { cart, clearCart } = useStore();
@@ -25,14 +26,26 @@ const Checkout = () => {
     setLoading(true);
 
     try {
+      // Validate inputs
+      const parsed = orderSchema.safeParse({
+        customer_name: name,
+        customer_phone: phone,
+        customer_address: address,
+      });
+      if (!parsed.success) {
+        toast.error(parsed.error.errors[0].message);
+        setLoading(false);
+        return;
+      }
+
       // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user.id,
-          customer_name: name.trim(),
-          customer_phone: phone.trim(),
-          customer_address: address.trim(),
+          customer_name: parsed.data.customer_name,
+          customer_phone: parsed.data.customer_phone,
+          customer_address: parsed.data.customer_address,
           total_amount: total,
           status: 'pending' as any,
         })

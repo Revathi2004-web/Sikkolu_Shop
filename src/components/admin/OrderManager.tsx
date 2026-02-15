@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { adminMessageSchema } from '@/lib/validation';
 
 const statusOptions = [
   { value: 'pending', label: '⏳ Pending' },
@@ -53,9 +54,14 @@ const OrderManager = () => {
   };
 
   const sendMessage = async (orderId: string) => {
+    const parsed = adminMessageSchema.safeParse(message);
+    if (!parsed.success) {
+      toast.error(parsed.error.errors[0].message);
+      return;
+    }
     const { error } = await supabase
       .from('orders')
-      .update({ admin_message: message })
+      .update({ admin_message: parsed.data })
       .eq('id', orderId);
     if (error) toast.error('Failed to send');
     else { toast.success('Message sent to customer'); setMessageDialog(null); setMessage(''); fetchOrders(); }
