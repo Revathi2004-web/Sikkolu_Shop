@@ -7,6 +7,7 @@ import { ArrowLeft, Package, Upload, X, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { reasonSchema } from '@/lib/validation';
 
 const statusLabels: Record<string, { label: string; color: string; emoji: string }> = {
   pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800', emoji: '⏳' },
@@ -57,18 +58,28 @@ const Orders = () => {
   }, [user]);
 
   const handleCancel = async (orderId: string) => {
+    const parsed = reasonSchema.safeParse(reason);
+    if (!parsed.success) {
+      toast.error(parsed.error.errors[0].message);
+      return;
+    }
     const { error } = await supabase
       .from('orders')
-      .update({ status: 'cancelled' as any, cancel_reason: reason })
+      .update({ status: 'cancelled' as any, cancel_reason: parsed.data })
       .eq('id', orderId);
     if (error) toast.error('Failed to cancel');
     else { toast.success('Order cancelled'); setCancelDialog(null); setReason(''); fetchOrders(); }
   };
 
   const handleReturnRequest = async (orderId: string) => {
+    const parsed = reasonSchema.safeParse(reason);
+    if (!parsed.success) {
+      toast.error(parsed.error.errors[0].message);
+      return;
+    }
     const { error } = await supabase
       .from('orders')
-      .update({ status: 'return_requested' as any, return_reason: reason })
+      .update({ status: 'return_requested' as any, return_reason: parsed.data })
       .eq('id', orderId);
     if (error) toast.error('Failed to request return');
     else { toast.success('Return requested'); setReturnDialog(null); setReason(''); fetchOrders(); }
