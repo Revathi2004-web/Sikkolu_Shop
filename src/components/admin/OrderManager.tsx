@@ -63,8 +63,21 @@ const OrderManager = () => {
       .from('orders')
       .update({ admin_message: parsed.data })
       .eq('id', orderId);
-    if (error) toast.error('Failed to send');
-    else { toast.success('Message sent to customer'); setMessageDialog(null); setMessage(''); fetchOrders(); }
+    if (error) {
+      toast.error('Failed to send');
+    } else {
+      // Find order and notify customer via WhatsApp
+      const order = orders.find(o => o.id === orderId);
+      if (order?.customer_phone) {
+        const phone = order.customer_phone.replace(/\s+/g, '').replace('+', '');
+        const msg = encodeURIComponent(`📩 Message from Sikkolu Specials:\n\nOrder #${orderId.slice(0, 8)}\n${parsed.data}`);
+        window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+      }
+      toast.success('Message sent to customer');
+      setMessageDialog(null);
+      setMessage('');
+      fetchOrders();
+    }
   };
 
   if (loading) return <div className="flex justify-center py-8"><div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" /></div>;
