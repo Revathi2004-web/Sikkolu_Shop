@@ -10,8 +10,8 @@ import { toast } from 'sonner';
 const CustomerAuth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +21,38 @@ const CustomerAuth = () => {
     setLoading(true);
 
     if (isLogin) {
-      const { error } = await signIn(email, password);
+      // Login with phone: look up email from profiles
+      if (!phone.trim()) {
+        toast.error('Phone number is required');
+        setLoading(false);
+        return;
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('phone', phone.trim())
+        .maybeSingle();
+
+      if (!profile) {
+        toast.error('No account found with this phone number');
+        setLoading(false);
+        return;
+      }
+
+      // Get email from auth user via a lookup - we need to find the email
+      // We'll use a different approach: store email in profile or use edge function
+      // For now, let's look up via the admin API through an edge function
+      const { data: userData } = await supabase.functions.invoke('lookup-email', {
+        body: { user_id: profile.user_id },
+      });
+
+      if (!userData?.email) {
+        toast.error('Login failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await signIn(userData.email, password);
       if (error) {
         toast.error(error.message);
       } else {
@@ -29,8 +60,14 @@ const CustomerAuth = () => {
         navigate('/store');
       }
     } else {
+      // Register with email + phone
       if (!phone.trim()) {
         toast.error('Phone number is required');
+        setLoading(false);
+        return;
+      }
+      if (!email.trim()) {
+        toast.error('Email is required');
         setLoading(false);
         return;
       }
@@ -38,7 +75,6 @@ const CustomerAuth = () => {
       if (error) {
         toast.error(error.message);
       } else {
-        // Save phone to profile after a short delay to allow trigger to create profile
         setTimeout(async () => {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
@@ -66,28 +102,28 @@ const CustomerAuth = () => {
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h1>
         <p className="text-muted-foreground mb-8">
-          {isLogin ? 'Login to continue shopping' : 'Register to start shopping'}
+          {isLogin ? 'Login with your phone number' : 'Register to start shopping'}
         </p>
 
         <form onSubmit={handleSubmit} className="w-full space-y-4">
-          <Input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="h-14 text-lg rounded-xl"
-            required
-          />
           {!isLogin && (
             <Input
-              type="tel"
-              placeholder="Phone number (e.g. +91 98765 43210)"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               className="h-14 text-lg rounded-xl"
               required
             />
           )}
+          <Input
+            type="tel"
+            placeholder="Phone number (e.g. +91 98765 43210)"
+            value={phone}
+            onChange={e => setPhone(e.target.value)}
+            className="h-14 text-lg rounded-xl"
+            required
+          />
           <Input
             type="password"
             placeholder="Password"
