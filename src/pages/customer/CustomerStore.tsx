@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ProductReviews from '@/components/ProductReviews';
 
 const CustomerStore = () => {
   const { products, categories, addToCart, wishlist, toggleWishlist, cart, contacts } = useStore();
@@ -109,6 +110,9 @@ const CustomerStore = () => {
             <div className="p-3">
               <div className="font-semibold text-sm truncate">{p.name}</div>
               <div className="text-primary font-bold mt-1">₹{p.price.toLocaleString()}</div>
+              <div className="mt-2">
+                <ProductReviews productName={p.name} />
+              </div>
               <div className="flex gap-1 mt-2">
                 <Button size="sm" className="flex-1 h-9 text-xs rounded-lg font-semibold" onClick={() => { addToCart(p); navigate('/cart'); }}>
                   Buy Now
