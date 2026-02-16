@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
@@ -10,6 +11,7 @@ const CustomerAuth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -27,10 +29,22 @@ const CustomerAuth = () => {
         navigate('/store');
       }
     } else {
+      if (!phone.trim()) {
+        toast.error('Phone number is required');
+        setLoading(false);
+        return;
+      }
       const { error } = await signUp(email, password);
       if (error) {
         toast.error(error.message);
       } else {
+        // Save phone to profile after a short delay to allow trigger to create profile
+        setTimeout(async () => {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            await supabase.from('profiles').update({ phone: phone.trim() }).eq('user_id', user.id);
+          }
+        }, 1000);
         toast.success('Account created! Please check your email to verify, then login.');
         setIsLogin(true);
       }
@@ -64,6 +78,16 @@ const CustomerAuth = () => {
             className="h-14 text-lg rounded-xl"
             required
           />
+          {!isLogin && (
+            <Input
+              type="tel"
+              placeholder="Phone number (e.g. +91 98765 43210)"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="h-14 text-lg rounded-xl"
+              required
+            />
+          )}
           <Input
             type="password"
             placeholder="Password"
