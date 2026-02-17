@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useStore } from '@/context/StoreContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Package, Upload, X, RotateCcw } from 'lucide-react';
@@ -23,6 +24,7 @@ const statusLabels: Record<string, { label: string; color: string; emoji: string
 
 const Orders = () => {
   const { user } = useAuth();
+  const { contacts } = useStore();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,6 +120,14 @@ const Orders = () => {
       .from('orders')
       .update({ payment_screenshot_url: filePath, status: 'paid' as any })
       .eq('id', orderId);
+
+    // Notify admin via WhatsApp about payment
+    const adminPhone = contacts[0]?.phone?.replace(/\s+/g, '').replace('+', '') || '';
+    if (adminPhone) {
+      const order = orders.find(o => o.id === orderId);
+      const msg = encodeURIComponent(`💳 Payment Received!\n\nOrder #${orderId.slice(0, 8)}\nCustomer: ${order?.customer_name || 'Unknown'}\nPhone: ${order?.customer_phone || ''}\nAmount: ₹${Number(order?.total_amount || 0).toLocaleString()}\n\nPayment screenshot uploaded. Please verify.`);
+      window.open(`https://wa.me/${adminPhone}?text=${msg}`, '_blank');
+    }
 
     toast.success('Payment screenshot uploaded! 🎉');
     setUploadDialog(null);

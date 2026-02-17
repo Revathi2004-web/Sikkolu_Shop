@@ -6,13 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const CustomerAuth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotPhone, setForgotPhone] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
@@ -21,7 +26,6 @@ const CustomerAuth = () => {
     setLoading(true);
 
     if (isLogin) {
-      // Login with phone: look up email from profiles
       if (!phone.trim()) {
         toast.error('Phone number is required');
         setLoading(false);
@@ -39,9 +43,6 @@ const CustomerAuth = () => {
         return;
       }
 
-      // Get email from auth user via a lookup - we need to find the email
-      // We'll use a different approach: store email in profile or use edge function
-      // For now, let's look up via the admin API through an edge function
       const { data: userData } = await supabase.functions.invoke('lookup-email', {
         body: { user_id: profile.user_id },
       });
@@ -60,14 +61,19 @@ const CustomerAuth = () => {
         navigate('/store');
       }
     } else {
-      // Register with email + phone
+      // Register
+      if (!name.trim()) {
+        toast.error('Name is required');
+        setLoading(false);
+        return;
+      }
       if (!phone.trim()) {
         toast.error('Phone number is required');
         setLoading(false);
         return;
       }
       if (!email.trim()) {
-        toast.error('Email is required');
+        toast.error('Email is required for account verification');
         setLoading(false);
         return;
       }
@@ -78,7 +84,10 @@ const CustomerAuth = () => {
         setTimeout(async () => {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            await supabase.from('profiles').update({ phone: phone.trim() }).eq('user_id', user.id);
+            await supabase.from('profiles').update({ 
+              phone: phone.trim(),
+              name: name.trim(),
+            }).eq('user_id', user.id);
           }
         }, 1000);
         toast.success('Account created! Please check your email to verify, then login.');
@@ -86,6 +95,61 @@ const CustomerAuth = () => {
       }
     }
     setLoading(false);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!forgotPhone.trim()) {
+      toast.error('Please enter your phone number');
+      return;
+    }
+    setForgotLoading(true);
+
+    // Look up user by phone
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('phone', forgotPhone.trim())
+      .maybeSingle();
+
+    if (!profile) {
+      toast.error('No account found with this phone number');
+      setForgotLoading(false);
+      return;
+    }
+
+    // Get email to generate reset link
+    const { data: userData } = await supabase.functions.invoke('lookup-email', {
+      body: { user_id: profile.user_id },
+    });
+
+    if (!userData?.email) {
+      toast.error('Could not process request. Please contact support.');
+      setForgotLoading(false);
+      return;
+    }
+
+    // Generate password reset and send link via WhatsApp
+    const { error } = await supabase.auth.resetPasswordForEmail(userData.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      toast.error('Failed to generate reset link');
+      setForgotLoading(false);
+      return;
+    }
+
+    // Send the reset notification via WhatsApp
+    const cleanPhone = forgotPhone.trim().replace(/\s+/g, '').replace('+', '');
+    const msg = encodeURIComponent(
+      `🔐 Password Reset - Sikkolu Specials\n\nHi! A password reset was requested for your account.\n\nPlease check your email (${userData.email}) for the reset link.\n\nIf you didn't request this, please ignore this message.`
+    );
+    window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+
+    toast.success('Password reset link sent! Check your WhatsApp & email.');
+    setForgotOpen(false);
+    setForgotPhone('');
+    setForgotLoading(false);
   };
 
   return (
@@ -108,10 +172,10 @@ const CustomerAuth = () => {
         <form onSubmit={handleSubmit} className="w-full space-y-4">
           {!isLogin && (
             <Input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={e => setName(e.target.value)}
               className="h-14 text-lg rounded-xl"
               required
             />
@@ -124,6 +188,16 @@ const CustomerAuth = () => {
             className="h-14 text-lg rounded-xl"
             required
           />
+          {!isLogin && (
+            <Input
+              type="email"
+              placeholder="Email (for verification only)"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="h-12 text-sm rounded-xl text-muted-foreground"
+              required
+            />
+          )}
           <Input
             type="password"
             placeholder="Password"
@@ -138,13 +212,42 @@ const CustomerAuth = () => {
           </Button>
         </form>
 
+        {isLogin && (
+          <button
+            onClick={() => setForgotOpen(true)}
+            className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors touch-manipulation"
+          >
+            Forgot Password?
+          </button>
+        )}
+
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="mt-6 text-sm text-primary font-medium touch-manipulation"
+          className="mt-4 text-sm text-primary font-medium touch-manipulation"
         >
           {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
         </button>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="max-w-[90vw] rounded-2xl">
+          <DialogHeader><DialogTitle>Reset Password</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Enter your registered phone number. We'll send a password reset notification via WhatsApp.
+          </p>
+          <Input
+            type="tel"
+            placeholder="Phone number (e.g. +91 98765 43210)"
+            value={forgotPhone}
+            onChange={e => setForgotPhone(e.target.value)}
+            className="h-12 rounded-xl"
+          />
+          <Button className="rounded-xl" onClick={handleForgotPassword} disabled={forgotLoading}>
+            {forgotLoading ? 'Processing...' : 'Send Reset Link via WhatsApp'}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
