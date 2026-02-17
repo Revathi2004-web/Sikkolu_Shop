@@ -142,7 +142,7 @@ const CustomerAuth = () => {
     // Send the reset notification via WhatsApp
     const cleanPhone = forgotPhone.trim().replace(/\s+/g, '').replace('+', '');
     const msg = encodeURIComponent(
-      `🔐 Password Reset - Sikkolu Specials\n\nHi! A password reset was requested for your account.\n\nPlease check your email (${userData.email}) for the reset link.\n\nIf you didn't request this, please ignore this message.`
+      `🔐 Password Reset - Srikakulam Store\n\nHi! A password reset was requested for your account.\n\nPlease check your email (${userData.email}) for the reset link.\n\nIf you didn't request this, please ignore this message.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
 
