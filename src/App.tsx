@@ -13,6 +13,7 @@ import CustomerAuth from "./pages/customer/CustomerAuth";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
 import Orders from "./pages/customer/Orders";
+import ResetPassword from "./pages/customer/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/cart" element={<ProtectedCustomerRoute><Cart /></ProtectedCustomerRoute>} />
               <Route path="/checkout" element={<ProtectedCustomerRoute><Checkout /></ProtectedCustomerRoute>} />
               <Route path="/orders" element={<ProtectedCustomerRoute><Orders /></ProtectedCustomerRoute>} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

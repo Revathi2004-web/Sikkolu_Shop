@@ -49,8 +49,20 @@ const OrderManager = () => {
       .from('orders')
       .update({ status: status as any })
       .eq('id', orderId);
-    if (error) toast.error('Failed to update');
-    else { toast.success(`Status updated to ${status}`); fetchOrders(); }
+    if (error) {
+      toast.error('Failed to update');
+    } else {
+      toast.success(`Status updated to ${status}`);
+      // Notify customer via WhatsApp
+      const order = orders.find(o => o.id === orderId);
+      if (order?.customer_phone) {
+        const phone = order.customer_phone.replace(/\s+/g, '').replace('+', '');
+        const statusLabel = statusOptions.find(s => s.value === status)?.label || status;
+        const msg = encodeURIComponent(`📦 Order Update - Sikkolu Specials\n\nOrder #${orderId.slice(0, 8)}\nStatus: ${statusLabel}\n\nThank you for shopping with us!`);
+        window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+      }
+      fetchOrders();
+    }
   };
 
   const sendMessage = async (orderId: string) => {
