@@ -1,16 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import logo from '@/assets/logo.png';
+import naturalBg from '@/assets/natural-bg.jpg';
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-6 py-12 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${naturalBg})` }}
+    >
       <div className="text-center mb-12">
+        <img src={logo} alt="Srikakulam Store" className="w-28 h-28 mx-auto mb-4 drop-shadow-lg" />
         <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">
-          Sikkolu <span className="text-primary">Specials</span>
+          Srikakulam <span className="text-primary">Store</span>
         </h1>
         <p className="text-muted-foreground text-lg">Premium Boutique Shopping</p>
       </div>
@@ -41,7 +47,7 @@ const Landing = () => {
         </button>
       </div>
 
-      <p className="mt-12 text-xs text-muted-foreground">© 2026 Sikkolu Specials</p>
+      <p className="mt-12 text-xs text-muted-foreground">© 2026 Srikakulam Store</p>
     </div>
   );
 };

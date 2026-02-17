@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 
-const ADMIN_USERNAME = 'Sikkoluadmin';
+const ADMIN_USERNAME = 'Srikakulamadmin';
 const ADMIN_EMAIL = 'devisrichintala23@gmail.com';
 
 const AdminLogin = () => {
