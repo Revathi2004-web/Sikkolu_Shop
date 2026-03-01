@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any; user: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -80,16 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     const rl = checkRateLimit();
-    if (rl.blocked) return { error: rl.error };
+    if (rl.blocked) return { error: rl.error, user: null };
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { emailRedirectTo: window.location.origin },
     });
     if (error) recordFailure();
     else failedAttempts.current = 0;
-    return { error };
+    return { error, user: data?.user ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
