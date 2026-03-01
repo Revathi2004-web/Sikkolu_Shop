@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { LogOut, Plus, Package, CreditCard, Phone, ClipboardList, Settings } from 'lucide-react';
+import { LogOut, Plus, Package, CreditCard, Phone, ClipboardList, Settings, Users } from 'lucide-react';
 import ProductManager from '@/components/admin/ProductManager';
 import CategoryManager from '@/components/admin/CategoryManager';
 import PaymentManager from '@/components/admin/PaymentManager';
 import ContactManager from '@/components/admin/ContactManager';
 import OrderManager from '@/components/admin/OrderManager';
+import CustomerManager from '@/components/admin/CustomerManager';
 import {
   Dialog,
   DialogContent,
@@ -17,16 +18,17 @@ import {
 } from '@/components/ui/dialog';
 
 const AdminDashboard = () => {
-  const { isAdmin, signOut } = useAuth();
+  const { isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [fabOpen, setFabOpen] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
 
   useEffect(() => {
-    if (!isAdmin) navigate('/admin/login');
-  }, [isAdmin, navigate]);
+    if (!loading && !isAdmin) navigate('/admin/login');
+  }, [isAdmin, loading, navigate]);
 
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
   if (!isAdmin) return null;
 
   return (
@@ -38,13 +40,14 @@ const AdminDashboard = () => {
         </Button>
       </header>
 
-      <Tabs defaultValue="orders" className="px-4 pt-4">
-        <TabsList className="w-full grid grid-cols-5 h-12 rounded-xl">
-          <TabsTrigger value="orders" className="text-xs gap-1"><ClipboardList className="w-4 h-4" /> Orders</TabsTrigger>
-          <TabsTrigger value="inventory" className="text-xs gap-1"><Package className="w-4 h-4" /> Items</TabsTrigger>
-          <TabsTrigger value="payments" className="text-xs gap-1"><CreditCard className="w-4 h-4" /> Pay</TabsTrigger>
-          <TabsTrigger value="contacts" className="text-xs gap-1"><Phone className="w-4 h-4" /> Contact</TabsTrigger>
-          <TabsTrigger value="settings" className="text-xs gap-1"><Settings className="w-4 h-4" /> Admin</TabsTrigger>
+      <Tabs defaultValue="orders" className="px-2 sm:px-4 pt-4">
+        <TabsList className="w-full grid grid-cols-6 h-12 rounded-xl overflow-x-auto">
+          <TabsTrigger value="orders" className="text-[10px] sm:text-xs gap-1 px-1"><ClipboardList className="w-4 h-4" /> <span className="hidden sm:inline">Orders</span></TabsTrigger>
+          <TabsTrigger value="inventory" className="text-[10px] sm:text-xs gap-1 px-1"><Package className="w-4 h-4" /> <span className="hidden sm:inline">Items</span></TabsTrigger>
+          <TabsTrigger value="payments" className="text-[10px] sm:text-xs gap-1 px-1"><CreditCard className="w-4 h-4" /> <span className="hidden sm:inline">Pay</span></TabsTrigger>
+          <TabsTrigger value="contacts" className="text-[10px] sm:text-xs gap-1 px-1"><Phone className="w-4 h-4" /> <span className="hidden sm:inline">Contact</span></TabsTrigger>
+          <TabsTrigger value="customers" className="text-[10px] sm:text-xs gap-1 px-1"><Users className="w-4 h-4" /> <span className="hidden sm:inline">Users</span></TabsTrigger>
+          <TabsTrigger value="settings" className="text-[10px] sm:text-xs gap-1 px-1"><Settings className="w-4 h-4" /> <span className="hidden sm:inline">Admin</span></TabsTrigger>
         </TabsList>
 
         <TabsContent value="orders" className="mt-4">
@@ -64,6 +67,10 @@ const AdminDashboard = () => {
           <ContactManager />
         </TabsContent>
 
+        <TabsContent value="customers" className="mt-4">
+          <CustomerManager />
+        </TabsContent>
+
         <TabsContent value="settings" className="mt-4 space-y-6">
           {/* Admin Credentials */}
           <div>
@@ -71,13 +78,13 @@ const AdminDashboard = () => {
             <div className="bg-card border border-border rounded-xl p-4 space-y-3">
               <div>
                 <div className="text-xs text-muted-foreground">Username</div>
-                <div className="font-semibold font-mono">Srikakulamadmin</div>
+                <div className="font-semibold font-mono text-sm">Srikakulamadmin</div>
               </div>
               <div>
                 <div className="text-xs text-muted-foreground">Password</div>
-                <div className="font-semibold font-mono">Sikkoluadmin@123</div>
+                <div className="font-semibold font-mono text-sm">Sikkoluadmin@123</div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">⚠️ Keep these credentials secure. Only share with trusted administrators.</p>
+              <p className="text-xs text-muted-foreground mt-2">⚠️ Keep these credentials secure.</p>
             </div>
           </div>
 
@@ -100,6 +107,10 @@ const AdminDashboard = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full" />
                 <span>Signed URLs for payment screenshots</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Email verification required for customers</span>
               </div>
             </div>
           </div>

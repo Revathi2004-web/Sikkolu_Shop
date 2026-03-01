@@ -77,21 +77,20 @@ const CustomerAuth = () => {
         setLoading(false);
         return;
       }
-      const { error } = await signUp(email, password);
+      const { error, user: newUser } = await signUp(email, password);
       if (error) {
         toast.error(error.message);
       } else {
-        setTimeout(async () => {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await supabase.from('profiles').update({ 
-              phone: phone.trim(),
-              name: name.trim(),
-            }).eq('user_id', user.id);
-          }
-        }, 1000);
+        // Update profile with phone and name using service-level function
+        if (newUser) {
+          await supabase.functions.invoke('update-profile', {
+            body: { user_id: newUser.id, phone: phone.trim(), name: name.trim() },
+          });
+        }
         toast.success('Account created! Please check your email to verify, then login.');
         setIsLogin(true);
+        setPhone('');
+        setPassword('');
       }
     }
     setLoading(false);
