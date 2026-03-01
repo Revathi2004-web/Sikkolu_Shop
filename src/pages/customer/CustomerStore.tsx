@@ -4,7 +4,7 @@ import { useStore } from '@/context/StoreContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut } from 'lucide-react';
+import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut, HeartIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ProductReviews from '@/components/ProductReviews';
@@ -41,6 +41,14 @@ const CustomerStore = () => {
           <div className="flex gap-1">
             <Button variant="ghost" size="icon" onClick={() => navigate('/orders')}>
               <Package className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="relative" onClick={() => navigate('/wishlist')}>
+              <Heart className={`w-5 h-5 ${wishlist.length > 0 ? 'fill-destructive text-destructive' : ''}`} />
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground text-[10px] rounded-full flex items-center justify-center font-bold">
+                  {wishlist.length}
+                </span>
+              )}
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setShowContact(true)}>
               <Phone className="w-5 h-5" />

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { LogOut, Plus, Package, CreditCard, Phone, ClipboardList } from 'lucide-react';
+import { LogOut, Plus, Package, CreditCard, Phone, ClipboardList, Settings } from 'lucide-react';
 import ProductManager from '@/components/admin/ProductManager';
 import CategoryManager from '@/components/admin/CategoryManager';
 import PaymentManager from '@/components/admin/PaymentManager';
@@ -39,11 +39,12 @@ const AdminDashboard = () => {
       </header>
 
       <Tabs defaultValue="orders" className="px-4 pt-4">
-        <TabsList className="w-full grid grid-cols-4 h-12 rounded-xl">
+        <TabsList className="w-full grid grid-cols-5 h-12 rounded-xl">
           <TabsTrigger value="orders" className="text-xs gap-1"><ClipboardList className="w-4 h-4" /> Orders</TabsTrigger>
           <TabsTrigger value="inventory" className="text-xs gap-1"><Package className="w-4 h-4" /> Items</TabsTrigger>
           <TabsTrigger value="payments" className="text-xs gap-1"><CreditCard className="w-4 h-4" /> Pay</TabsTrigger>
           <TabsTrigger value="contacts" className="text-xs gap-1"><Phone className="w-4 h-4" /> Contact</TabsTrigger>
+          <TabsTrigger value="settings" className="text-xs gap-1"><Settings className="w-4 h-4" /> Admin</TabsTrigger>
         </TabsList>
 
         <TabsContent value="orders" className="mt-4">
@@ -61,6 +62,47 @@ const AdminDashboard = () => {
 
         <TabsContent value="contacts" className="mt-4">
           <ContactManager />
+        </TabsContent>
+
+        <TabsContent value="settings" className="mt-4 space-y-6">
+          {/* Admin Credentials */}
+          <div>
+            <h2 className="text-lg font-serif font-semibold mb-3">🔐 Admin Credentials</h2>
+            <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+              <div>
+                <div className="text-xs text-muted-foreground">Username</div>
+                <div className="font-semibold font-mono">Srikakulamadmin</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Password</div>
+                <div className="font-semibold font-mono">Sikkoluadmin@123</div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">⚠️ Keep these credentials secure. Only share with trusted administrators.</p>
+            </div>
+          </div>
+
+          {/* Security Info */}
+          <div>
+            <h2 className="text-lg font-serif font-semibold mb-3">🛡️ Security</h2>
+            <div className="bg-card border border-border rounded-xl p-4 space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Role-Based Access Control (RBAC) enabled</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Row Level Security (RLS) on all tables</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Rate-limited login (5 attempts / 5 min block)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                <span>Signed URLs for payment screenshots</span>
+              </div>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 
