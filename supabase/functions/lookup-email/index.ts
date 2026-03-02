@@ -14,9 +14,31 @@ Deno.serve(async (req) => {
     return new Response('Method not allowed', { status: 405, headers: corsHeaders })
   }
 
+  // Validate authentication
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
+
+  // Verify the caller's identity
+  const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: authHeader } },
+  })
+
+  const { data: claimsData, error: claimsError } = await userClient.auth.getUser()
+  if (claimsError || !claimsData?.user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
   const { user_id } = await req.json()
 
@@ -27,6 +49,26 @@ Deno.serve(async (req) => {
     })
   }
 
+  // Only allow users to look up their own email
+  if (claimsData.user.id !== user_id) {
+    // Check if requester is admin
+    const adminClient = createClient(supabaseUrl, serviceRoleKey)
+    const { data: roleData } = await adminClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', claimsData.user.id)
+      .eq('role', 'admin')
+      .maybeSingle()
+
+    if (!roleData) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey)
   const { data, error } = await supabase.auth.admin.getUserById(user_id)
 
   if (error || !data?.user) {
