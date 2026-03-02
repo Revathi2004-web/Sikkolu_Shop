@@ -68,6 +68,12 @@ const CustomerAuth = () => {
         return;
       }
 
+      if (password.length < 6) {
+        toast.error('Password must be at least 6 characters');
+        setLoading(false);
+        return;
+      }
+
       const { error, user: newUser } = await signUp(generatedEmail, password);
       if (error) {
         if (error.message?.includes('already registered')) {
@@ -76,16 +82,16 @@ const CustomerAuth = () => {
           toast.error(error.message);
         }
       } else {
+        // Update profile with phone and name
         if (newUser) {
           await supabase.functions.invoke('update-profile', {
             body: { user_id: newUser.id, phone: normalizedPhone, name: name.trim() },
           });
         }
-        toast.success('Account created successfully! You can now login.');
-        setIsLogin(true);
-        setPhone('');
-        setPassword('');
-        setName('');
+        toast.success('Account created! Logging you in... 🎉');
+        // Auto-confirm is enabled, so user is already logged in after signUp
+        // Navigate directly to store
+        navigate('/store');
       }
     }
     setLoading(false);
@@ -163,7 +169,7 @@ const CustomerAuth = () => {
           </div>
           <Input
             type="password"
-            placeholder="Password"
+            placeholder="Password (min 6 characters)"
             value={password}
             onChange={e => setPassword(e.target.value)}
             className="h-14 text-lg rounded-xl"
