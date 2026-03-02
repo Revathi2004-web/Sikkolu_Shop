@@ -8,10 +8,29 @@ import { ArrowLeft, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
+const INDIAN_PHONE_REGEX = /^(\+91|91)?[6-9]\d{9}$/;
+
+const normalizePhone = (phone: string): string => {
+  const digits = phone.replace(/[\s\-\(\)]/g, '');
+  if (digits.startsWith('+91')) return digits;
+  if (digits.startsWith('91') && digits.length === 12) return '+' + digits;
+  if (/^[6-9]\d{9}$/.test(digits)) return '+91' + digits;
+  return digits;
+};
+
+const isValidIndianPhone = (phone: string): boolean => {
+  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+  return INDIAN_PHONE_REGEX.test(cleaned);
+};
+
+const phoneToEmail = (phone: string): string => {
+  const normalized = normalizePhone(phone).replace('+', '');
+  return `${normalized}@srikakulamstore.app`;
+};
+
 const CustomerAuth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,127 +44,79 @@ const CustomerAuth = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (!isValidIndianPhone(phone)) {
+      toast.error('Please enter a valid Indian phone number (e.g. 9876543210 or +91 98765 43210)');
+      setLoading(false);
+      return;
+    }
+
+    const normalizedPhone = normalizePhone(phone);
+    const generatedEmail = phoneToEmail(phone);
+
     if (isLogin) {
-      if (!phone.trim()) {
-        toast.error('Phone number is required');
-        setLoading(false);
-        return;
-      }
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('phone', phone.trim())
-        .maybeSingle();
-
-      if (!profile) {
-        toast.error('No account found with this phone number');
-        setLoading(false);
-        return;
-      }
-
-      const { data: userData } = await supabase.functions.invoke('lookup-email', {
-        body: { user_id: profile.user_id },
-      });
-
-      if (!userData?.email) {
-        toast.error('Login failed. Please try again.');
-        setLoading(false);
-        return;
-      }
-
-      const { error } = await signIn(userData.email, password);
+      const { error } = await signIn(generatedEmail, password);
       if (error) {
-        toast.error(error.message);
+        toast.error('Invalid phone number or password');
       } else {
         toast.success('Welcome back! 🎉');
         navigate('/store');
       }
     } else {
-      // Register
       if (!name.trim()) {
         toast.error('Name is required');
         setLoading(false);
         return;
       }
-      if (!phone.trim()) {
-        toast.error('Phone number is required');
-        setLoading(false);
-        return;
-      }
-      if (!email.trim()) {
-        toast.error('Email is required for account verification');
-        setLoading(false);
-        return;
-      }
-      const { error, user: newUser } = await signUp(email, password);
+
+      const { error, user: newUser } = await signUp(generatedEmail, password);
       if (error) {
-        toast.error(error.message);
+        if (error.message?.includes('already registered')) {
+          toast.error('This phone number is already registered. Please login instead.');
+        } else {
+          toast.error(error.message);
+        }
       } else {
-        // Update profile with phone and name using service-level function
         if (newUser) {
           await supabase.functions.invoke('update-profile', {
-            body: { user_id: newUser.id, phone: phone.trim(), name: name.trim() },
+            body: { user_id: newUser.id, phone: normalizedPhone, name: name.trim() },
           });
         }
-        toast.success('Account created! Please check your email to verify, then login.');
+        toast.success('Account created successfully! You can now login.');
         setIsLogin(true);
         setPhone('');
         setPassword('');
+        setName('');
       }
     }
     setLoading(false);
   };
 
   const handleForgotPassword = async () => {
-    if (!forgotPhone.trim()) {
-      toast.error('Please enter your phone number');
+    if (!isValidIndianPhone(forgotPhone)) {
+      toast.error('Please enter a valid Indian phone number');
       return;
     }
     setForgotLoading(true);
 
-    // Look up user by phone
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .eq('phone', forgotPhone.trim())
-      .maybeSingle();
+    const generatedEmail = phoneToEmail(forgotPhone);
 
-    if (!profile) {
-      toast.error('No account found with this phone number');
-      setForgotLoading(false);
-      return;
-    }
-
-    // Get email to generate reset link
-    const { data: userData } = await supabase.functions.invoke('lookup-email', {
-      body: { user_id: profile.user_id },
-    });
-
-    if (!userData?.email) {
-      toast.error('Could not process request. Please contact support.');
-      setForgotLoading(false);
-      return;
-    }
-
-    // Generate password reset and send link via WhatsApp
-    const { error } = await supabase.auth.resetPasswordForEmail(userData.email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(generatedEmail, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
-      toast.error('Failed to generate reset link');
+      toast.error('Failed to process reset request. Please try again.');
       setForgotLoading(false);
       return;
     }
 
-    // Send the reset notification via WhatsApp
-    const cleanPhone = forgotPhone.trim().replace(/\s+/g, '').replace('+', '');
+    const cleanPhone = normalizePhone(forgotPhone).replace('+', '');
     const msg = encodeURIComponent(
-      `🔐 Password Reset - Srikakulam Store\n\nHi! A password reset was requested for your account.\n\nPlease check your email (${userData.email}) for the reset link.\n\nIf you didn't request this, please ignore this message.`
+      `🔐 Password Reset - Srikakulam Store\n\nHi! A password reset was requested for your account.\n\nPlease check the reset link sent to your account.\n\nIf you didn't request this, please ignore this message.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
 
-    toast.success('Password reset link sent! Check your WhatsApp & email.');
+    toast.success('Password reset initiated! Check WhatsApp for instructions.');
     setForgotOpen(false);
     setForgotPhone('');
     setForgotLoading(false);
@@ -179,24 +150,17 @@ const CustomerAuth = () => {
               required
             />
           )}
-          <Input
-            type="tel"
-            placeholder="Phone number (e.g. +91 98765 43210)"
-            value={phone}
-            onChange={e => setPhone(e.target.value)}
-            className="h-14 text-lg rounded-xl"
-            required
-          />
-          {!isLogin && (
+          <div>
             <Input
-              type="email"
-              placeholder="Email (for verification only)"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="h-12 text-sm rounded-xl text-muted-foreground"
+              type="tel"
+              placeholder="Phone number (e.g. 9876543210)"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="h-14 text-lg rounded-xl"
               required
             />
-          )}
+            <p className="text-xs text-muted-foreground mt-1 ml-1">🇮🇳 Indian numbers only (+91)</p>
+          </div>
           <Input
             type="password"
             placeholder="Password"
@@ -233,15 +197,18 @@ const CustomerAuth = () => {
         <DialogContent className="max-w-[90vw] rounded-2xl">
           <DialogHeader><DialogTitle>Reset Password</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Enter your registered phone number. We'll send a password reset notification via WhatsApp.
+            Enter your registered Indian phone number to reset your password.
           </p>
-          <Input
-            type="tel"
-            placeholder="Phone number (e.g. +91 98765 43210)"
-            value={forgotPhone}
-            onChange={e => setForgotPhone(e.target.value)}
-            className="h-12 rounded-xl"
-          />
+          <div>
+            <Input
+              type="tel"
+              placeholder="Phone number (e.g. 9876543210)"
+              value={forgotPhone}
+              onChange={e => setForgotPhone(e.target.value)}
+              className="h-12 rounded-xl"
+            />
+            <p className="text-xs text-muted-foreground mt-1 ml-1">🇮🇳 Indian numbers only (+91)</p>
+          </div>
           <Button className="rounded-xl" onClick={handleForgotPassword} disabled={forgotLoading}>
             {forgotLoading ? 'Processing...' : 'Send Reset Link via WhatsApp'}
           </Button>
