@@ -99,7 +99,7 @@ const CustomerStore = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="px-4 grid grid-cols-2 gap-3">
+      <div className="px-4 grid grid-cols-3 gap-2">
         {filtered.map(p => (
           <div key={p.id} className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="aspect-square bg-accent flex items-center justify-center relative">
