@@ -1,49 +1,14 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Lock, Globe } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage, langLabels, Lang } from '@/context/LanguageContext';
 import logo from '@/assets/logo.png';
 import naturalBg from '@/assets/natural-bg.jpg';
-
-const translations = {
-  en: {
-    tagline: 'Experience the Soul of Srikakulam',
-    customerStore: '🛍️ Customer Store',
-    customerDesc: 'Browse & shop our collection',
-    customerLogin: 'Login to start shopping',
-    adminPortal: '🔐 Admin Portal',
-    adminDesc: 'Manage your business',
-    copyright: '© 2026 Srikakulam Store',
-  },
-  te: {
-    tagline: 'శ్రీకాకుళం ఆత్మను అనుభవించండి',
-    customerStore: '🛍️ కస్టమర్ స్టోర్',
-    customerDesc: 'మా కలెక్షన్ బ్రౌజ్ చేయండి',
-    customerLogin: 'షాపింగ్ ప్రారంభించడానికి లాగిన్ అవ్వండి',
-    adminPortal: '🔐 అడ్మిన్ పోర్టల్',
-    adminDesc: 'మీ వ్యాపారాన్ని నిర్వహించండి',
-    copyright: '© 2026 శ్రీకాకుళం స్టోర్',
-  },
-  hi: {
-    tagline: 'श्रीकाकुलम की आत्मा का अनुभव करें',
-    customerStore: '🛍️ कस्टमर स्टोर',
-    customerDesc: 'हमारा कलेक्शन ब्राउज़ करें',
-    customerLogin: 'शॉपिंग शुरू करने के लिए लॉगिन करें',
-    adminPortal: '🔐 एडमिन पोर्टल',
-    adminDesc: 'अपना व्यवसाय प्रबंधित करें',
-    copyright: '© 2026 श्रीकाकुलम स्टोर',
-  },
-};
-
-type Lang = keyof typeof translations;
-
-const langLabels: Record<Lang, string> = { en: 'EN', te: 'తె', hi: 'हि' };
 
 const Landing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [lang, setLang] = useState<Lang>('en');
-  const t = translations[lang];
+  const { lang, setLang, t } = useLanguage();
 
   return (
     <div
@@ -67,7 +32,7 @@ const Landing = () => {
       </div>
 
       <div className="text-center mb-12">
-        <img src={logo} alt="Srikakulam Store" className="w-28 h-28 mx-auto mb-4 drop-shadow-lg" />
+        <img src={logo} alt="Srikakulam Store" className="w-28 h-28 mx-auto mb-4 drop-shadow-lg" loading="lazy" />
         <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">
           Srikakulam <span className="text-primary">Store</span>
         </h1>

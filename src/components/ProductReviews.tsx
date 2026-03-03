@@ -16,9 +16,10 @@ interface Review {
 
 interface ProductReviewsProps {
   productName: string;
+  compact?: boolean;
 }
 
-const ProductReviews = ({ productName }: ProductReviewsProps) => {
+const ProductReviews = ({ productName, compact = false }: ProductReviewsProps) => {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [rating, setRating] = useState(0);
@@ -50,13 +51,11 @@ const ProductReviews = ({ productName }: ProductReviewsProps) => {
       return;
     }
     setSubmitting(true);
-
     const { data: profile } = await supabase
       .from('profiles')
       .select('name')
       .eq('user_id', user.id)
       .maybeSingle();
-
     const { error } = await supabase.from('product_reviews').insert({
       product_name: productName,
       user_id: user.id,
@@ -64,7 +63,6 @@ const ProductReviews = ({ productName }: ProductReviewsProps) => {
       rating,
       review: reviewText.trim().slice(0, 500),
     });
-
     if (error) toast.error('Failed to submit review');
     else {
       toast.success('Review submitted! ⭐');
@@ -76,7 +74,7 @@ const ProductReviews = ({ productName }: ProductReviewsProps) => {
     setSubmitting(false);
   };
 
-  const renderStars = (count: number, size = 'w-4 h-4') => (
+  const renderStars = (count: number, size = 'w-3 h-3') => (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map(i => (
         <Star key={i} className={`${size} ${i <= count ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`} />
@@ -84,9 +82,24 @@ const ProductReviews = ({ productName }: ProductReviewsProps) => {
     </div>
   );
 
+  // Compact mode for product grid cards
+  if (compact) {
+    return (
+      <div className="flex items-center gap-1">
+        {avgRating ? (
+          <>
+            {renderStars(Math.round(Number(avgRating)), 'w-2.5 h-2.5')}
+            <span className="text-[10px] font-medium">{avgRating}</span>
+          </>
+        ) : (
+          <span className="text-[10px] text-muted-foreground">No reviews</span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
-      {/* Summary */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {avgRating && (
@@ -105,7 +118,6 @@ const ProductReviews = ({ productName }: ProductReviewsProps) => {
         )}
       </div>
 
-      {/* Write Review Form */}
       {showForm && (
         <div className="bg-accent rounded-xl p-3 space-y-2">
           <div className="flex gap-1">
@@ -134,7 +146,6 @@ const ProductReviews = ({ productName }: ProductReviewsProps) => {
         </div>
       )}
 
-      {/* Reviews List */}
       {reviews.slice(0, 3).map(r => (
         <div key={r.id} className="border-t border-border pt-2">
           <div className="flex items-center justify-between">
