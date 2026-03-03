@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useStore } from '@/context/StoreContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Package, Upload, X, RotateCcw } from 'lucide-react';
@@ -25,6 +26,7 @@ const statusLabels: Record<string, { label: string; color: string; emoji: string
 const Orders = () => {
   const { user } = useAuth();
   const { contacts } = useStore();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +127,7 @@ const Orders = () => {
     const adminPhone = contacts[0]?.phone?.replace(/\s+/g, '').replace('+', '') || '';
     if (adminPhone) {
       const order = orders.find(o => o.id === orderId);
-      const msg = encodeURIComponent(`💳 Payment Received!\n\nOrder #${orderId.slice(0, 8)}\nCustomer: ${order?.customer_name || 'Unknown'}\nPhone: ${order?.customer_phone || ''}\nAmount: ₹${Number(order?.total_amount || 0).toLocaleString()}\n\nPayment screenshot uploaded. Please verify.`);
+      const msg = encodeURIComponent(`💳 Payment Received!\n\nOrder #${orderId.slice(0, 8)}\nCustomer: ${order?.customer_name || 'Unknown'}\nAmount: ₹${Number(order?.total_amount || 0).toLocaleString()}\n\nPayment screenshot uploaded.`);
       window.open(`https://wa.me/${adminPhone}?text=${msg}`, '_blank');
     }
 
@@ -138,9 +140,7 @@ const Orders = () => {
   const canCancel = (status: string) => !['cancelled', 'delivered', 'returned', 'return_requested'].includes(status);
   const canReturn = (order: any) => {
     if (order.status !== 'delivered') return false;
-    const deliveredDate = new Date(order.updated_at);
-    const now = new Date();
-    const daysDiff = (now.getTime() - deliveredDate.getTime()) / (1000 * 60 * 60 * 24);
+    const daysDiff = (Date.now() - new Date(order.updated_at).getTime()) / (1000 * 60 * 60 * 24);
     return daysDiff <= 7;
   };
   const needsPayment = (status: string) => status === 'confirmed' || status === 'payment_pending';
@@ -151,7 +151,7 @@ const Orders = () => {
         <button onClick={() => navigate('/store')} className="touch-manipulation">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-xl font-serif font-bold">My Orders</h1>
+        <h1 className="text-xl font-serif font-bold">{t.myOrders}</h1>
       </header>
 
       {loading ? (
@@ -161,8 +161,8 @@ const Orders = () => {
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
           <Package className="w-16 h-16 mb-4" />
-          <p className="text-lg font-serif">No orders yet</p>
-          <Button variant="outline" className="mt-4 rounded-xl" onClick={() => navigate('/store')}>Start Shopping</Button>
+          <p className="text-lg font-serif">{t.noOrders}</p>
+          <Button variant="outline" className="mt-4 rounded-xl" onClick={() => navigate('/store')}>{t.startShopping}</Button>
         </div>
       ) : (
         <div className="px-4 pt-4 space-y-4">
@@ -184,14 +184,14 @@ const Orders = () => {
                 <div className="space-y-1 mb-3">
                   {order.order_items?.map((item: any) => (
                     <div key={item.id} className="flex justify-between text-sm">
-                      <span>{item.product_name} × {item.quantity}</span>
-                      <span>₹{(item.product_price * item.quantity).toLocaleString()}</span>
+                      <span className="truncate mr-2">{item.product_name} × {item.quantity}</span>
+                      <span className="whitespace-nowrap">₹{(item.product_price * item.quantity).toLocaleString()}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="border-t border-border pt-2 flex justify-between font-bold text-sm">
-                  <span>Total</span>
+                  <span>{t.total}</span>
                   <span className="text-primary">₹{Number(order.total_amount).toLocaleString()}</span>
                 </div>
 
@@ -206,17 +206,17 @@ const Orders = () => {
                 <div className="flex gap-2 mt-3 flex-wrap">
                   {needsPayment(order.status) && (
                     <Button size="sm" className="rounded-lg text-xs" onClick={() => setUploadDialog(order.id)}>
-                      <Upload className="w-3 h-3 mr-1" /> Upload Payment
+                      <Upload className="w-3 h-3 mr-1" /> {t.uploadPayment}
                     </Button>
                   )}
                   {canCancel(order.status) && (
                     <Button size="sm" variant="outline" className="rounded-lg text-xs text-destructive" onClick={() => setCancelDialog(order.id)}>
-                      <X className="w-3 h-3 mr-1" /> Cancel
+                      <X className="w-3 h-3 mr-1" /> {t.cancelOrder}
                     </Button>
                   )}
                   {canReturn(order) && (
                     <Button size="sm" variant="outline" className="rounded-lg text-xs" onClick={() => setReturnDialog(order.id)}>
-                      <RotateCcw className="w-3 h-3 mr-1" /> Return
+                      <RotateCcw className="w-3 h-3 mr-1" /> {t.returnOrder}
                     </Button>
                   )}
                 </div>
@@ -231,7 +231,7 @@ const Orders = () => {
         <DialogContent className="max-w-[90vw] rounded-2xl">
           <DialogHeader><DialogTitle>Cancel Order</DialogTitle></DialogHeader>
           <textarea
-            placeholder="Reason for cancellation (optional)"
+            placeholder="Reason for cancellation"
             value={reason}
             onChange={e => setReason(e.target.value)}
             className="w-full min-h-[80px] rounded-xl border border-input bg-background px-3 py-2 text-sm"
