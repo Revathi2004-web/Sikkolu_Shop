@@ -72,22 +72,6 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="settings" className="mt-4 space-y-6">
-          {/* Admin Credentials */}
-          <div>
-            <h2 className="text-lg font-serif font-semibold mb-3">🔐 Admin Credentials</h2>
-            <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-              <div>
-                <div className="text-xs text-muted-foreground">Username</div>
-                <div className="font-semibold font-mono text-sm">Srikakulamadmin</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground">Password</div>
-                <div className="font-semibold font-mono text-sm">Sikkoluadmin@123</div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">⚠️ Keep these credentials secure.</p>
-            </div>
-          </div>
-
           {/* Security Info */}
           <div>
             <h2 className="text-lg font-serif font-semibold mb-3">🛡️ Security</h2>

@@ -32,7 +32,8 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [cancelDialog, setCancelDialog] = useState<string | null>(null);
   const [returnDialog, setReturnDialog] = useState<string | null>(null);
-  const [reason, setReason] = useState('');
+  const [cancelReason, setCancelReason] = useState('');
+  const [returnReason, setReturnReason] = useState('');
   const [uploadDialog, setUploadDialog] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -62,7 +63,7 @@ const Orders = () => {
   }, [user]);
 
   const handleCancel = async (orderId: string) => {
-    const parsed = reasonSchema.safeParse(reason);
+    const parsed = reasonSchema.safeParse(cancelReason);
     if (!parsed.success) {
       toast.error(parsed.error.errors[0].message);
       return;
@@ -72,11 +73,11 @@ const Orders = () => {
       .update({ status: 'cancelled' as any, cancel_reason: parsed.data })
       .eq('id', orderId);
     if (error) toast.error('Failed to cancel');
-    else { toast.success('Order cancelled'); setCancelDialog(null); setReason(''); fetchOrders(); }
+    else { toast.success('Order cancelled'); setCancelDialog(null); setCancelReason(''); fetchOrders(); }
   };
 
   const handleReturnRequest = async (orderId: string) => {
-    const parsed = reasonSchema.safeParse(reason);
+    const parsed = reasonSchema.safeParse(returnReason);
     if (!parsed.success) {
       toast.error(parsed.error.errors[0].message);
       return;
@@ -86,7 +87,7 @@ const Orders = () => {
       .update({ status: 'return_requested' as any, return_reason: parsed.data })
       .eq('id', orderId);
     if (error) toast.error('Failed to request return');
-    else { toast.success('Return requested'); setReturnDialog(null); setReason(''); fetchOrders(); }
+    else { toast.success('Return requested'); setReturnDialog(null); setReturnReason(''); fetchOrders(); }
   };
 
   const handleUploadScreenshot = async (orderId: string, file: File) => {
@@ -137,7 +138,7 @@ const Orders = () => {
     fetchOrders();
   };
 
-  const canCancel = (status: string) => !['cancelled', 'delivered', 'returned', 'return_requested'].includes(status);
+  const canCancel = (status: string) => ['pending', 'confirmed'].includes(status);
   const canReturn = (order: any) => {
     if (order.status !== 'delivered') return false;
     const daysDiff = (Date.now() - new Date(order.updated_at).getTime()) / (1000 * 60 * 60 * 24);
@@ -227,13 +228,13 @@ const Orders = () => {
       )}
 
       {/* Cancel Dialog */}
-      <Dialog open={!!cancelDialog} onOpenChange={() => setCancelDialog(null)}>
+      <Dialog open={!!cancelDialog} onOpenChange={(open) => { if (!open) { setCancelDialog(null); setCancelReason(''); } }}>
         <DialogContent className="max-w-[90vw] rounded-2xl">
           <DialogHeader><DialogTitle>Cancel Order</DialogTitle></DialogHeader>
           <textarea
             placeholder="Reason for cancellation"
-            value={reason}
-            onChange={e => setReason(e.target.value)}
+            value={cancelReason}
+            onChange={e => setCancelReason(e.target.value)}
             className="w-full min-h-[80px] rounded-xl border border-input bg-background px-3 py-2 text-sm"
           />
           <Button variant="destructive" className="rounded-xl" onClick={() => cancelDialog && handleCancel(cancelDialog)}>
@@ -243,14 +244,14 @@ const Orders = () => {
       </Dialog>
 
       {/* Return Dialog */}
-      <Dialog open={!!returnDialog} onOpenChange={() => setReturnDialog(null)}>
+      <Dialog open={!!returnDialog} onOpenChange={(open) => { if (!open) { setReturnDialog(null); setReturnReason(''); } }}>
         <DialogContent className="max-w-[90vw] rounded-2xl">
           <DialogHeader><DialogTitle>Request Return</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Returns accepted within 7 days of delivery.</p>
           <textarea
             placeholder="Reason for return"
-            value={reason}
-            onChange={e => setReason(e.target.value)}
+            value={returnReason}
+            onChange={e => setReturnReason(e.target.value)}
             className="w-full min-h-[80px] rounded-xl border border-input bg-background px-3 py-2 text-sm"
             required
           />

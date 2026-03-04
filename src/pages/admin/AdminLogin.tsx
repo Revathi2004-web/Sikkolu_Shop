@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 
-const ADMIN_USERNAME = 'Srikakulamadmin';
-const ADMIN_EMAIL = 'devisrichintala23@gmail.com';
+const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME || 'Srikakulamadmin';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@srikakulamstore.app';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
