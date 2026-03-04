@@ -1,1 +1,7 @@
 project_id = "yudcyzxpsrdcmukbcriv"
+
+[functions.lookup-email]
+verify_jwt = false
+
+[functions.update-profile]
+verify_jwt = false
