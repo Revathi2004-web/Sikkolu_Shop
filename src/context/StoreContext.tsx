@@ -73,7 +73,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     toast.success('Category deleted');
   };
   const addPaymentMethod = (p: Omit<PaymentMethod, 'id'>) => {
-    setPaymentMethods(prev => [...prev, { ...p, id: genId() }]);
+    setPaymentMethods(prev => [...prev, { ...p, id: genId() } as PaymentMethod]);
     toast.success('Payment method added!');
   };
   const deletePaymentMethod = (id: string) => {
