@@ -9,6 +9,7 @@ import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut } from '
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ProductReviews from '@/components/ProductReviews';
+import CustomerAssistant from '@/components/CustomerAssistant';
 
 const CustomerStore = () => {
   const { products, categories, addToCart, wishlist, toggleWishlist, cart, contacts } = useStore();
@@ -161,6 +162,8 @@ const CustomerStore = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <CustomerAssistant />
     </div>
   );
 };
