@@ -14,16 +14,23 @@ const CustomerManager = () => {
   const [customers, setCustomers] = useState<CustomerProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchCustomers = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_id, name, phone, address, created_at')
+      .order('created_at', { ascending: false });
+    setCustomers(data || []);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchCustomers = async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('user_id, name, phone, address, created_at')
-        .order('created_at', { ascending: false });
-      setCustomers(data || []);
-      setLoading(false);
-    };
     fetchCustomers();
+    // Realtime subscription for new registrations
+    const channel = supabase
+      .channel('admin-customers')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchCustomers())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   if (loading) {

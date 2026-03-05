@@ -16,9 +16,16 @@ export interface Category {
 
 export interface PaymentMethod {
   id: string;
-  type: 'upi' | 'qr';
+  type: 'upi' | 'qr' | 'bank' | 'scanner';
   value: string;
   label: string;
+  bankDetails?: {
+    accountName?: string;
+    accountNumber?: string;
+    ifscCode?: string;
+    bankName?: string;
+  };
+  scannerImage?: string;
 }
 
 export interface ContactNumber {
