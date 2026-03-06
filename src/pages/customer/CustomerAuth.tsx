@@ -87,9 +87,14 @@ const CustomerAuth = () => {
           await supabase.functions.invoke('update-profile', {
             body: { user_id: newUser.id, phone: normalizedPhone, name: name.trim() },
           });
+          // Sign out immediately so user must login manually
+          await supabase.auth.signOut();
         }
-        toast.success('Account created! Welcome! 🎉');
-        navigate('/store');
+        toast.success('Account created successfully! Please login with your credentials.');
+        setIsLogin(true);
+        setPhone('');
+        setPassword('');
+        setName('');
       }
     }
     setLoading(false);
