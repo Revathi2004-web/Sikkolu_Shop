@@ -214,11 +214,12 @@ const CustomerAuth = () => {
         toast.error(error.message);
       }
     } else {
+      // Always sign out to prevent auto-login after registration
+      await supabase.auth.signOut();
       if (newUser) {
         await supabase.functions.invoke('update-profile', {
           body: { user_id: newUser.id, phone: normalizedPhone, name: name.trim() },
         });
-        await supabase.auth.signOut();
       }
       toast.success('Account created successfully! Please login with your credentials.');
       setIsLogin(true);
