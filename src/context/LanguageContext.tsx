@@ -3,13 +3,13 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 const translations = {
   en: {
     // Landing
-    tagline: 'Experience the Soul of Srikakulam',
+    tagline: 'Experience the Soul of Sikkolu Specials',
     customerStore: '🛍️ Customer Store',
     customerDesc: 'Browse & shop our collection',
     customerLogin: 'Login to start shopping',
     adminPortal: '🔐 Admin Portal',
     adminDesc: 'Manage your business',
-    copyright: '© 2026 Srikakulam Store',
+    copyright: '© 2026 Sikkolu Specials',
     // Auth
     welcomeBack: 'Welcome Back',
     createAccount: 'Create Account',
