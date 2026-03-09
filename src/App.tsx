@@ -19,6 +19,7 @@ const Checkout = lazy(() => import("./pages/customer/Checkout"));
 const Orders = lazy(() => import("./pages/customer/Orders"));
 const ResetPassword = lazy(() => import("./pages/customer/ResetPassword"));
 const Wishlist = lazy(() => import("./pages/customer/Wishlist"));
+const CustomerProfile = lazy(() => import("./pages/customer/CustomerProfile"));
 
 const queryClient = new QueryClient();
 
