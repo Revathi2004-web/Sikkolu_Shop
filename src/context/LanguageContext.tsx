@@ -3,13 +3,13 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 const translations = {
   en: {
     // Landing
-    tagline: 'Experience the Soul of Srikakulam',
+    tagline: 'Experience the Soul of Sikkolu Specials',
     customerStore: '🛍️ Customer Store',
     customerDesc: 'Browse & shop our collection',
     customerLogin: 'Login to start shopping',
     adminPortal: '🔐 Admin Portal',
     adminDesc: 'Manage your business',
-    copyright: '© 2026 Srikakulam Store',
+    copyright: '© 2026 Sikkolu Specials',
     // Auth
     welcomeBack: 'Welcome Back',
     createAccount: 'Create Account',
@@ -72,13 +72,13 @@ const translations = {
     back: 'Back',
   },
   te: {
-    tagline: 'శ్రీకాకుళం ఆత్మను అనుభవించండి',
+    tagline: 'సిక్కోలు స్పెషల్స్ ఆత్మను అనుభవించండి',
     customerStore: '🛍️ కస్టమర్ స్టోర్',
     customerDesc: 'మా కలెక్షన్ బ్రౌజ్ చేయండి',
     customerLogin: 'షాపింగ్ ప్రారంభించడానికి లాగిన్ అవ్వండి',
     adminPortal: '🔐 అడ్మిన్ పోర్టల్',
     adminDesc: 'మీ వ్యాపారాన్ని నిర్వహించండి',
-    copyright: '© 2026 శ్రీకాకుళం స్టోర్',
+    copyright: '© 2026 సిక్కోలు స్పెషల్స్',
     welcomeBack: 'మళ్ళీ స్వాగతం',
     createAccount: 'ఖాతా సృష్టించండి',
     loginWithPhone: 'మీ ఫోన్ నంబర్‌తో లాగిన్ అవ్వండి',
@@ -135,13 +135,13 @@ const translations = {
     back: 'వెనుకకు',
   },
   hi: {
-    tagline: 'श्रीकाकुलम की आत्मा का अनुभव करें',
+    tagline: 'सिक्कोलू स्पेशल्स का अनुभव करें',
     customerStore: '🛍️ कस्टमर स्टोर',
     customerDesc: 'हमारा कलेक्शन ब्राउज़ करें',
     customerLogin: 'शॉपिंग शुरू करने के लिए लॉगिन करें',
     adminPortal: '🔐 एडमिन पोर्टल',
     adminDesc: 'अपना व्यवसाय प्रबंधित करें',
-    copyright: '© 2026 श्रीकाकुलम स्टोर',
+    copyright: '© 2026 सिक्कोलू स्पेशल्स',
     welcomeBack: 'वापसी पर स्वागत',
     createAccount: 'खाता बनाएं',
     loginWithPhone: 'अपने फ़ोन नंबर से लॉगिन करें',

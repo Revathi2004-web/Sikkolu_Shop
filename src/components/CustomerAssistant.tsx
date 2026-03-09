@@ -13,9 +13,9 @@ interface Message {
 }
 
 const greetings: Record<string, string> = {
-  en: "Hi! 👋 I'm your Srikakulam Store assistant. Ask me about your orders or products!",
-  te: "నమస్కారం! 👋 నేను శ్రీకాకుళం స్టోర్ అసిస్టెంట్. మీ ఆర్డర్లు లేదా ఉత్పత్తుల గురించి అడగండి!",
-  hi: "नमस्ते! 👋 मैं श्रीकाकुलम स्टोर असिस्टेंट हूँ। अपने ऑर्डर या उत्पादों के बारे में पूछें!",
+  en: "Hi! 👋 I'm your Sikkolu Specials assistant. Ask me about your orders or products!",
+  te: "నమస్కారం! 👋 నేను సిక్కోలు స్పెషల్స్ అసిస్టెంట్. మీ ఆర్డర్లు లేదా ఉత్పత్తుల గురించి అడగండి!",
+  hi: "नमस्ते! 👋 मैं सिक्कोलू स्पेशल्स असिस्टेंट हूँ। अपने ऑर्डर या उत्पादों के बारे में पूछें!",
 };
 
 const placeholders: Record<string, string> = {

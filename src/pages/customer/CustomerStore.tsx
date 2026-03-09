@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut } from 'lucide-react';
+import { ShoppingCart, Heart, ArrowLeft, Search, Phone, Package, LogOut, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import ProductReviews from '@/components/ProductReviews';
@@ -40,8 +40,11 @@ const CustomerStore = () => {
           <button onClick={() => navigate('/')} className="touch-manipulation">
             <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
-          <h1 className="text-lg font-serif font-bold truncate">Srikakulam <span className="text-primary">Store</span></h1>
+          <h1 className="text-lg font-serif font-bold truncate">Sikkolu <span className="text-primary">Specials</span></h1>
           <div className="flex gap-0.5">
+            <Button variant="ghost" size="icon" className="w-9 h-9" onClick={() => navigate('/profile')}>
+              <User className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" className="w-9 h-9" onClick={() => navigate('/orders')}>
               <Package className="w-4 h-4" />
             </Button>

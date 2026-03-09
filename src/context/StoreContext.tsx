@@ -46,7 +46,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>(sampleProducts);
   const [categories, setCategories] = useState<Category[]>(sampleCategories);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
-    { id: '1', type: 'upi', value: 'srikakulam@upi', label: 'Main UPI' },
+    { id: '1', type: 'upi', value: 'sikkolspecials@upi', label: 'Main UPI' },
   ]);
   const [contacts, setContacts] = useState<ContactNumber[]>([
     { id: '1', phone: '+91 98765 43210', label: 'Main Contact' },
