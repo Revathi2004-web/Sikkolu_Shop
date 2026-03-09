@@ -59,7 +59,7 @@ const OrderManager = () => {
       if (order?.customer_phone) {
         const phone = order.customer_phone.replace(/\s+/g, '').replace('+', '');
         const statusLabel = statusOptions.find(s => s.value === status)?.label || status;
-        const msg = encodeURIComponent(`📦 Order Update - Srikakulam Store\n\nOrder #${orderId.slice(0, 8)}\nStatus: ${statusLabel}\n\nThank you for shopping with us!`);
+        const msg = encodeURIComponent(`📦 Order Update - Sikkolu Specials\n\nOrder #${orderId.slice(0, 8)}\nStatus: ${statusLabel}\n\nThank you for shopping with us!`);
         window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
       }
       fetchOrders();
