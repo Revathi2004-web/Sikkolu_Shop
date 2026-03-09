@@ -141,7 +141,7 @@ const translations = {
     customerLogin: 'शॉपिंग शुरू करने के लिए लॉगिन करें',
     adminPortal: '🔐 एडमिन पोर्टल',
     adminDesc: 'अपना व्यवसाय प्रबंधित करें',
-    copyright: '© 2026 श्रीकाकुलम स्टोर',
+    copyright: '© 2026 सिक्कोलू स्पेशल्स',
     welcomeBack: 'वापसी पर स्वागत',
     createAccount: 'खाता बनाएं',
     loginWithPhone: 'अपने फ़ोन नंबर से लॉगिन करें',
