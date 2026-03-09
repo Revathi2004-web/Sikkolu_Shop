@@ -42,6 +42,9 @@ const CustomerStore = () => {
           </button>
           <h1 className="text-lg font-serif font-bold truncate">Sikkolu <span className="text-primary">Specials</span></h1>
           <div className="flex gap-0.5">
+            <Button variant="ghost" size="icon" className="w-9 h-9" onClick={() => navigate('/profile')}>
+              <User className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" className="w-9 h-9" onClick={() => navigate('/orders')}>
               <Package className="w-4 h-4" />
             </Button>
