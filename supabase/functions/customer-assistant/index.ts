@@ -28,7 +28,7 @@ serve(async (req) => {
       ? `\n\nCustomer's recent orders:\n${JSON.stringify(orders, null, 2)}`
       : '\n\nThis customer has no orders yet.';
 
-    const systemPrompt = `You are a friendly customer service assistant for "Srikakulam Store", an e-commerce store.
+    const systemPrompt = `You are a friendly customer service assistant for "Sikkolu Specials", an e-commerce store.
 ${langInstruction}
 
 Core Responsibilities:

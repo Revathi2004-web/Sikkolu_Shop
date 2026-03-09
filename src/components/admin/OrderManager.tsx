@@ -119,7 +119,7 @@ const OrderManager = () => {
         const phone = order.customer_phone.replace(/\s+/g, '').replace('+', '');
         if (!uniquePhones.has(phone)) {
           uniquePhones.add(phone);
-          const msg = encodeURIComponent(`📩 Message from Srikakulam Store:\n\n${parsed.data}`);
+          const msg = encodeURIComponent(`📩 Message from Sikkolu Specials:\n\n${parsed.data}`);
           window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
         }
       }
