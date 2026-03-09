@@ -78,7 +78,7 @@ const translations = {
     customerLogin: 'షాపింగ్ ప్రారంభించడానికి లాగిన్ అవ్వండి',
     adminPortal: '🔐 అడ్మిన్ పోర్టల్',
     adminDesc: 'మీ వ్యాపారాన్ని నిర్వహించండి',
-    copyright: '© 2026 శ్రీకాకుళం స్టోర్',
+    copyright: '© 2026 సిక్కోలు స్పెషల్స్',
     welcomeBack: 'మళ్ళీ స్వాగతం',
     createAccount: 'ఖాతా సృష్టించండి',
     loginWithPhone: 'మీ ఫోన్ నంబర్‌తో లాగిన్ అవ్వండి',
