@@ -9,7 +9,7 @@ const translations = {
     customerLogin: 'Login to start shopping',
     adminPortal: '🔐 Admin Portal',
     adminDesc: 'Manage your business',
-    copyright: '© 2026 Sikkolu Specials',
+    copyright: '© 2026 Srikakulam Specials',
     // Auth
     welcomeBack: 'Welcome Back',
     createAccount: 'Create Account',
