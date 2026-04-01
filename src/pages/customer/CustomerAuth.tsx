@@ -127,7 +127,7 @@ const CustomerAuth = () => {
     }
     const cleanPhone = normalizePhone(forgotPhone).replace('+', '');
     const msg = encodeURIComponent(
-      `🔐 Password Reset - Sikkolu Specials\n\nHi! A password reset was requested for your account.\n\nPlease check the reset link sent to your account.\n\nIf you didn't request this, please ignore this message.`
+      `🔐 Password Reset - Srikakulam Specials\n\nHi! A password reset was requested for your account.\n\nPlease check the reset link sent to your account.\n\nIf you didn't request this, please ignore this message.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
     toast.success('Password reset initiated! Check WhatsApp for instructions.');
