@@ -3,7 +3,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 const translations = {
   en: {
     // Landing
-    tagline: 'Experience the Soul of Sikkolu Specials',
+    tagline: 'Experience the Soul of Srikakulam',
     customerStore: '🛍️ Customer Store',
     customerDesc: 'Browse & shop our collection',
     customerLogin: 'Login to start shopping',
