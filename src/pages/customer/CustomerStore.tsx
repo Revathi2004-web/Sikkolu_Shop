@@ -56,7 +56,7 @@ const CustomerStore = () => {
           <button onClick={() => navigate('/')} className="touch-manipulation p-1">
             <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
-          <h1 className="text-lg font-serif font-bold truncate">Sikkolu <span className="text-primary">Specials</span></h1>
+          <h1 className="text-lg font-serif font-bold truncate">Srikakulam <span className="text-primary">Specials</span></h1>
           <div className="flex gap-0.5">
             <Button variant="ghost" size="icon" className="w-10 h-10" onClick={() => navigate('/profile')}>
               <User className="w-4 h-4" />

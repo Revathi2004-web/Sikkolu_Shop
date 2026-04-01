@@ -147,7 +147,7 @@ const CustomerAuth = () => {
           <ShoppingBag className="w-10 h-10 text-primary" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-serif font-bold mb-1 text-foreground">
-          {isLogin ? 'Sikkolu Specials' : t.createAccount}
+          {isLogin ? 'Srikakulam Specials' : t.createAccount}
         </h1>
         <p className="text-muted-foreground mb-6 sm:mb-8 text-center text-sm sm:text-base">
           {isLogin ? t.loginWithPhone : t.registerToShop}

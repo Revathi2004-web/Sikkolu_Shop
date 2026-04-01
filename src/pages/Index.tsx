@@ -32,9 +32,9 @@ const Landing = () => {
       </div>
 
       <div className="text-center mb-12">
-        <img src={logo} alt="Sikkolu Specials" className="w-28 h-28 mx-auto mb-4 drop-shadow-lg" loading="lazy" />
+        <img src={logo} alt="Srikakulam Specials" className="w-28 h-28 mx-auto mb-4 drop-shadow-lg" loading="lazy" />
         <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-2">
-          Sikkolu <span className="text-primary">Specials</span>
+          Srikakulam <span className="text-primary">Specials</span>
         </h1>
         <p className="text-muted-foreground text-lg">{t.tagline}</p>
       </div>
