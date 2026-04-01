@@ -14,6 +14,7 @@ interface StoreContextType {
   deletePaymentMethod: (id: string) => void;
   contacts: ContactNumber[];
   addContact: (c: Omit<ContactNumber, 'id'>) => void;
+  updateContact: (id: string, c: Partial<Omit<ContactNumber, 'id'>>) => void;
   deleteContact: (id: string) => void;
   cart: CartItem[];
   addToCart: (product: Product) => void;
@@ -84,6 +85,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setContacts(prev => [...prev, { ...c, id: genId() }]);
     toast.success('Contact added!');
   };
+  const updateContact = (id: string, c: Partial<Omit<ContactNumber, 'id'>>) => {
+    setContacts(prev => prev.map(ct => ct.id === id ? { ...ct, ...c } : ct));
+    toast.success('Contact updated!');
+  };
   const deleteContact = (id: string) => {
     setContacts(prev => prev.filter(c => c.id !== id));
     toast.success('Contact deleted');
@@ -113,7 +118,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       products, addProduct, deleteProduct,
       categories, addCategory, deleteCategory,
       paymentMethods, addPaymentMethod, deletePaymentMethod,
-      contacts, addContact, deleteContact,
+      contacts, addContact, updateContact, deleteContact,
       cart, addToCart, removeFromCart, updateCartQty, clearCart,
       wishlist, toggleWishlist,
     }}>
