@@ -23,7 +23,7 @@ const extractDigits = (phone: string): string => {
 
 const phoneToEmail = (phone: string): string => {
   const normalized = normalizePhone(phone).replace('+', '');
-  return `${normalized}@sikkolspecials.app`;
+  return `${normalized}@srikakulamspecials.app`;
 };
 
 const CustomerAuth = () => {
@@ -127,7 +127,7 @@ const CustomerAuth = () => {
     }
     const cleanPhone = normalizePhone(forgotPhone).replace('+', '');
     const msg = encodeURIComponent(
-      `🔐 Password Reset - Sikkolu Specials\n\nHi! A password reset was requested for your account.\n\nPlease check the reset link sent to your account.\n\nIf you didn't request this, please ignore this message.`
+      `🔐 Password Reset - Srikakulam Specials\n\nHi! A password reset was requested for your account.\n\nPlease check the reset link sent to your account.\n\nIf you didn't request this, please ignore this message.`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
     toast.success('Password reset initiated! Check WhatsApp for instructions.');
@@ -147,7 +147,7 @@ const CustomerAuth = () => {
           <ShoppingBag className="w-10 h-10 text-primary" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-serif font-bold mb-1 text-foreground">
-          {isLogin ? 'Sikkolu Specials' : t.createAccount}
+          {isLogin ? 'Srikakulam Specials' : t.createAccount}
         </h1>
         <p className="text-muted-foreground mb-6 sm:mb-8 text-center text-sm sm:text-base">
           {isLogin ? t.loginWithPhone : t.registerToShop}
