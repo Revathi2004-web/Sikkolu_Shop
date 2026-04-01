@@ -23,7 +23,7 @@ const extractDigits = (phone: string): string => {
 
 const phoneToEmail = (phone: string): string => {
   const normalized = normalizePhone(phone).replace('+', '');
-  return `${normalized}@sikkolspecials.app`;
+  return `${normalized}@srikakulamspecials.app`;
 };
 
 const CustomerAuth = () => {
