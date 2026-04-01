@@ -82,7 +82,7 @@ const OrderManager = () => {
       const order = orders.find(o => o.id === orderId);
       if (order?.customer_phone) {
         const phone = order.customer_phone.replace(/\s+/g, '').replace('+', '');
-        const msg = encodeURIComponent(`📩 Message from Sikkolu Specials:\n\nOrder #${orderId.slice(0, 8)}\n${parsed.data}`);
+        const msg = encodeURIComponent(`📩 Message from Srikakulam Specials:\n\nOrder #${orderId.slice(0, 8)}\n${parsed.data}`);
         window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
       }
       toast.success('Message sent to customer');
